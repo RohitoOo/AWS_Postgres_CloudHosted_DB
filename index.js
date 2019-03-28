@@ -33,16 +33,12 @@ app.get("/select", (req, res) => {
 })
 
 app.get("/create", (req, res) => {
-  const query = "CREATE TABLE abc ( name text );"
+  const query = "CREATE TABLE some_table_name ( name text );"
   client.query(query, (err, results) => {
     if (err) {
       res.send(err)
     } else {
-      const { rows } = results
-      console.log(results.rows)
-      res.send(JSON.stringify(rows.map(each => each.name)))
-
-      rows.map(each => console.log(each.name))
+      res.send("Table Created")
     }
   })
 })
