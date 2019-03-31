@@ -116,6 +116,27 @@ app.post("/createuser", (req, res) => {
   }
 })
 
+// Update Partner Table
+
+app.post("/updatepartner", (req, res) => {
+  const { partner_id, partnerName } = req.body.partner
+  console.log(partner_id, partnerName)
+  const query = `UPDATE cloud.partner SET name = '${partnerName}' WHERE (id = '${partner_id}');`
+  client.query(query, (err, results) => {
+    if (err) {
+      res.send(err)
+      console.log(err)
+    } else {
+      res.send(results)
+      console.log(results)
+      // const { rows } = results
+      // res.send(JSON.stringify(rows.map(each => each.id)))
+
+      // rows.map(each => console.log(each.id))
+    }
+  })
+})
+
 // Input Data into Table
 
 app.get("/register", (req, res) => {
