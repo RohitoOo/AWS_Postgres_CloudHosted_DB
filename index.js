@@ -42,7 +42,7 @@ app.post("/getallusers", (req, res) => {
       console.log(err)
     } else {
       res.send(results)
-      console.log(results)
+      // console.log(results)
     }
   })
 })
@@ -52,8 +52,6 @@ app.post("/getallusers", (req, res) => {
 app.post("/getuser", (req, res) => {
   const email = req.body.email
 
-  console.log(email)
-
   const query = `SELECT * FROM cloud.user WHERE cloud.user.email = '${email}';`
 
   client.query(query, (err, results) => {
@@ -62,7 +60,7 @@ app.post("/getuser", (req, res) => {
       console.log(err)
     } else {
       res.send(results)
-      console.log(results)
+      // console.log(results)
       // const { rows } = results
       // res.send(JSON.stringify(rows.map(each => each.id)))
 
@@ -75,30 +73,27 @@ app.post("/getuser", (req, res) => {
 
 app.post("/createuser", (req, res) => {
   const { email, username } = req.body
-  console.log("EMAIL", email)
   try {
     const newUserId = uuidv1()
     const newPartnerId = uuidv1()
-    console.log(1, { newPartnerId })
     const userQuery = `INSERT INTO cloud.user (id, email, phone, partner_id, role, username) VALUES ('${newUserId}', '${email}', '1212121212', '${newPartnerId}', 'ADMIN', '${username}');`
 
     client.query(userQuery, (err, results) => {
       if (err) {
-        res.send(err)
+        res.send("userQuery", err)
         console.log(err)
       } else {
-        console.log("USER CREATED", results)
+        console.log("USER CREATED")
       }
     })
 
     const partnerQuery = `INSERT INTO cloud.partner (id, name) VALUES ('${newPartnerId}', 'Partner-${newPartnerId}');`
-    console.log(2, { newPartnerId })
     client.query(partnerQuery, (err, results) => {
       if (err) {
         res.send(err)
-        console.log(err)
+        console.log("partnerQuery", err)
       } else {
-        console.log("Partner CREATED", results)
+        console.log("Partner CREATED")
         // res.send({
         //   message: `Partner CREATED", ${results}`,
         //   body: results
@@ -148,7 +143,7 @@ app.post("/updateuser", (req, res) => {
       console.log(err)
     } else {
       res.send(results)
-      console.log("UPDATED User", results)
+      console.log("UPDATED User")
     }
   })
 })
