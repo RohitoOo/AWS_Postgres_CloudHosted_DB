@@ -13,19 +13,20 @@ app.use(bodyParser.urlencoded({ extended: true }))
 
 app.use(cors())
 
-const client = new mysql.createConnection({
-  user: credentials.user,
-  password: credentials.password,
-  database: credentials.database,
-  host: credentials.host
-})
-client.connect(err => {
-  if (err) {
-    console.log(err)
-  } else {
-    console.log("Connected to DB ")
-  }
-})
+// const client = new mysql.createConnection({
+//   // user: credentials.user,
+//   // password: credentials.password,
+//   // database: credentials.database,
+//   // host: credentials.host
+// })
+
+// client.connect(err => {
+//   if (err) {
+//     console.log(err)
+//   } else {
+//     console.log("Connected to DB ")
+//   }
+// })
 
 app.get("/", (req, res) => {
   res.send("Welcome To Rohito's Api - Available Endpoints : /getallusers")
@@ -185,7 +186,7 @@ app.post("/creategateway", (req, res) => {
   }
 })
 
-const port = 4000
+const port = process.env.PORT || 4000
 app.listen(port, () => {
   console.log("We Are Live On Port ", port)
 })
