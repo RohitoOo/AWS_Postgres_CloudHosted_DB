@@ -76,7 +76,7 @@ app.post("/createuser", (req, res) => {
   try {
     const newUserId = uuidv1()
     const newPartnerId = uuidv1()
-    const userQuery = `INSERT INTO cloud.user (id, email, phone, partner_id, role, username) VALUES ('${newUserId}', '${email}', '1212121212', '${newPartnerId}', 'ADMIN', '${username}');`
+    const userQuery = `INSERT INTO cloud.user (id, email, phone, partner_id, role_id, username) VALUES ('${newUserId}', '${email}', '1212121212', '${newPartnerId}', 1, '${username}');`
 
     client.query(userQuery, (err, results) => {
       if (err) {
@@ -134,8 +134,7 @@ app.post("/updateuser", (req, res) => {
   const { userName, email, phone, role, partner_id } = req.body.user
 
   console.log(req.body.user)
-  const query = `UPDATE cloud.user SET partner_id = '${partner_id}',  username = '${userName}', phone = '${phone}' , role ='${role}'  WHERE (email = '${email}');`
-  // const query = `UPDATE cloud.user SET partner_id = '${partner_id}', SET username = '${userName}', SET phone = '${phone}', SET role = '${role}' WHERE (email = '${email}'); SET SQL_SAFE_UPDATES = 0;`
+  const query = `UPDATE cloud.user SET partner_id = '${partner_id}',  username = '${userName}', phone = '${phone}' , role_id ='${role}'  WHERE (email = '${email}');`
 
   client.query(query, (err, results) => {
     if (err) {
@@ -148,17 +147,42 @@ app.post("/updateuser", (req, res) => {
   })
 })
 
-// Input Data into Table
+// Create Gateway
 
-app.get("/register", (req, res) => {
-  // const query = "INSERT INTO `cloud`.`user` (`id`, `email`, `phone`, `partner_id`, `role`) VALUES ('31331', '112', '1212121212', '1', '1');"
-  // client.query(query, (err, results) => {
-  //   if (err) {
-  //     res.send(err)
-  //   } else {
-  //     res.send("Table Created")
-  //   }
-  // })
+app.post("/creategateway", (req, res) => {
+  const { name, ip, partner_id } = req.body.gateway
+
+  try {
+    const newGatewayId = uuidv1()
+
+    const createGatewayQuery = `INSERT INTO cloud.gateways (id, name, ip) VALUES ('${newGatewayId}', '${name}', '${ip}');`
+
+    client.query(createGatewayQuery, (err, results) => {
+      if (err) {
+        res.send(err)
+        console.log(err)
+      } else {
+        console.log("GATEWAY CREATED")
+      }
+    })
+
+    const updatePartnerQuery = `UPDATE cloud.partner SET gateway_id = '${newGatewayId}' WHERE (id = '${partner_id}');`
+
+    client.query(updatePartnerQuery, (err, results) => {
+      if (err) {
+        res.send(err)
+        console.log("partnerQuery", err)
+      } else {
+        console.log("Partner UPDATED")
+        // res.send({
+        //   message: `Partner CREATED", ${results}`,
+        //   body: results
+        // })
+      }
+    })
+  } catch (err) {
+    console.log("Create Gateway Query Error", err)
+  }
 })
 
 const port = 4000
