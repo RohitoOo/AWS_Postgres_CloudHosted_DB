@@ -28,14 +28,14 @@ client.connect(err => {
 })
 
 app.get("/", (req, res) => {
-  res.send("Available End Points: /select | /create")
+  res.send("Welcome To Rohito's Api - Available Endpoints : /getallusers")
 })
 
 // List All Users
 
-app.get("/select", (req, res) => {
-  const query =
-    "INSERT INTO `cloud`.`user` (`id`, `email`, `phone`, `partner_id`, `role`) VALUES ('911', 'IAMGOOOOOD@gmail.com', '1212121212', '1', '1');"
+app.post("/getallusers", (req, res) => {
+  const { partner_id } = req.body
+  const query = `SELECT * FROM cloud.user where partner_id = '${partner_id}' `
   client.query(query, (err, results) => {
     if (err) {
       res.send(err)
@@ -43,10 +43,6 @@ app.get("/select", (req, res) => {
     } else {
       res.send(results)
       console.log(results)
-      // const { rows } = results
-      // res.send(JSON.stringify(rows.map(each => each.id)))
-
-      // rows.map(each => console.log(each.id))
     }
   })
 })
@@ -120,7 +116,7 @@ app.post("/createuser", (req, res) => {
 
 app.post("/updatepartner", (req, res) => {
   const { partner_id, partnerName } = req.body.partner
-  console.log(partner_id, partnerName)
+  // console.log(partner_id, partnerName)
   const query = `UPDATE cloud.partner SET name = '${partnerName}' WHERE (id = '${partner_id}');`
   client.query(query, (err, results) => {
     if (err) {
@@ -133,6 +129,26 @@ app.post("/updatepartner", (req, res) => {
       // res.send(JSON.stringify(rows.map(each => each.id)))
 
       // rows.map(each => console.log(each.id))
+    }
+  })
+})
+
+// Invite User To Join Partner
+
+app.post("/updateuser", (req, res) => {
+  const { userName, email, phone, role, partner_id } = req.body.user
+
+  console.log(req.body.user)
+  const query = `UPDATE cloud.user SET partner_id = '${partner_id}',  username = '${userName}', phone = '${phone}' , role ='${role}'  WHERE (email = '${email}');`
+  // const query = `UPDATE cloud.user SET partner_id = '${partner_id}', SET username = '${userName}', SET phone = '${phone}', SET role = '${role}' WHERE (email = '${email}'); SET SQL_SAFE_UPDATES = 0;`
+
+  client.query(query, (err, results) => {
+    if (err) {
+      res.send(err)
+      console.log(err)
+    } else {
+      res.send(results)
+      console.log("UPDATED User", results)
     }
   })
 })
