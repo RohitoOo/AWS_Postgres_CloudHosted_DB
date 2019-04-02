@@ -13,20 +13,20 @@ app.use(bodyParser.urlencoded({ extended: true }))
 
 app.use(cors())
 
-// const client = new mysql.createConnection({
-//   // user: credentials.user,
-//   // password: credentials.password,
-//   // database: credentials.database,
-//   // host: credentials.host
-// })
+const client = new mysql.createConnection({
+  user: credentials.user,
+  password: credentials.password,
+  database: credentials.database,
+  host: credentials.host
+})
 
-// client.connect(err => {
-//   if (err) {
-//     console.log(err)
-//   } else {
-//     console.log("Connected to DB ")
-//   }
-// })
+client.connect(err => {
+  if (err) {
+    console.log(err)
+  } else {
+    console.log("Connected to DB ")
+  }
+})
 
 app.get("/", (req, res) => {
   res.send("Welcome To Rohito's Api - Available Endpoints : /getallusers")
@@ -53,21 +53,23 @@ app.post("/getallusers", (req, res) => {
 app.post("/getuser", (req, res) => {
   const email = req.body.email
 
-  const query = `SELECT * FROM cloud.user WHERE cloud.user.email = '${email}';`
+  console.log(email)
 
-  client.query(query, (err, results) => {
-    if (err) {
-      res.send(err)
-      console.log(err)
-    } else {
-      res.send(results)
-      // console.log(results)
-      // const { rows } = results
-      // res.send(JSON.stringify(rows.map(each => each.id)))
+  // const query = `SELECT * FROM cloud.user WHERE cloud.user.email = '${email}';`
 
-      // rows.map(each => console.log(each.id))
-    }
-  })
+  // client.query(query, (err, results) => {
+  //   if (err) {
+  //     res.send(err)
+  //     console.log(err)
+  //   } else {
+  //     res.send(results)
+  //     // console.log(results)
+  //     // const { rows } = results
+  //     // res.send(JSON.stringify(rows.map(each => each.id)))
+
+  //     // rows.map(each => console.log(each.id))
+  //   }
+  // })
 })
 
 // Create User And Partner
@@ -77,7 +79,27 @@ app.post("/createuser", (req, res) => {
   try {
     const newUserId = uuidv1()
     const newPartnerId = uuidv1()
-    const userQuery = `INSERT INTO cloud.user (id, email, phone, partner_id, role_id, username) VALUES ('${newUserId}', '${email}', '1212121212', '${newPartnerId}', 1, '${username}');`
+
+    const gatewayQuery = `INSERT INTO cloud.gateways (id, name, ip) VALUES ('Gateway-${newPartnerId}', 'Gateway-${newPartnerId}', '1.1.1.1');`
+    client.query(gatewayQuery, (err, results) => {
+      if (err) {
+        res.send(err)
+        console.log("gatewayQuery", err)
+      } else {
+        console.log("Gateway CREATED")
+      }
+    })
+
+    const partnerQuery = `INSERT INTO cloud.partner (id, name, gateway_id) VALUES ('${newPartnerId}', 'Partner-${newPartnerId}', 'Gateway-${newPartnerId}');`
+    client.query(partnerQuery, (err, results) => {
+      if (err) {
+        res.send(err)
+        console.log("partnerQuery", err)
+      } else {
+        console.log("Partner CREATED")
+      }
+    })
+    const userQuery = `INSERT INTO cloud.user (id, email, phone, partner_id, role_id, username) VALUES ('${newUserId}', '${email}', '1111111111', '${newPartnerId}', 1, '${username}');`
 
     client.query(userQuery, (err, results) => {
       if (err) {
@@ -88,23 +110,10 @@ app.post("/createuser", (req, res) => {
       }
     })
 
-    const partnerQuery = `INSERT INTO cloud.partner (id, name) VALUES ('${newPartnerId}', 'Partner-${newPartnerId}');`
-    client.query(partnerQuery, (err, results) => {
-      if (err) {
-        res.send(err)
-        console.log("partnerQuery", err)
-      } else {
-        console.log("Partner CREATED")
-        // res.send({
-        //   message: `Partner CREATED", ${results}`,
-        //   body: results
-        // })
-      }
-    })
-
     res.send(newPartnerId)
   } catch (err) {
     console.log("Query Error", err)
+    res.send(err)
   }
 })
 
@@ -112,7 +121,6 @@ app.post("/createuser", (req, res) => {
 
 app.post("/updatepartner", (req, res) => {
   const { partner_id, partnerName } = req.body.partner
-  // console.log(partner_id, partnerName)
   const query = `UPDATE cloud.partner SET name = '${partnerName}' WHERE (id = '${partner_id}');`
   client.query(query, (err, results) => {
     if (err) {
@@ -121,10 +129,6 @@ app.post("/updatepartner", (req, res) => {
     } else {
       res.send(results)
       console.log(results)
-      // const { rows } = results
-      // res.send(JSON.stringify(rows.map(each => each.id)))
-
-      // rows.map(each => console.log(each.id))
     }
   })
 })
